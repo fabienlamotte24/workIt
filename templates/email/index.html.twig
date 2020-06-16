@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello EmailController!{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.21/sp-1.1.1/datatables.min.css"/>
+
+<div class="row">
+
+    {# BLOCK TEMPLATE EMAIL #}
+    <div class="col-6">
+        <div class="row mt-5 mb-5">
+            <div class="offset-2 col-8">
+                <div class="row">
+                    <div class="col-12">
+                        {# MESSAGE HTTP => SUCCES ENREGISTREMENT NOUVEAU TEMPLATE #}
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                        <a href="{{ path('ajout_template') }}" class="btn btn-primary">Créer nouveau template</a>
+                    </div>
+                    <div class="col-12">
+                        <table id="template_table" class="table table-dark p-0 m-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Id</th>
+                                    <th class="text-center">Titre</th>
+                                    <th class="text-center">Categorie</th>
+                                    <th class="text-center">Date de création</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# HISTORIQUE DES EMAILS ENVOYES #}
+    <div class="col-6">
+        <div class="row mt-5 mb-5">
+            <div class="offset-2 col-8">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.21/sp-1.1.1/datatables.min.js"></script>
+
+    {# DATATABLE TEMPLATE EMAIL #}
+    <script type="text/javascript">
+        
+    </script>
+
+{% endblock %}

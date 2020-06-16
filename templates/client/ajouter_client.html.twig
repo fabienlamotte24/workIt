@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    <style>
+        label{
+            color:white;
+        }
+        .blockForm{
+            background-color:#4c4c4c;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="row no-gutters align-items-center m-2">
+        <div class="col-5 bg bg-warning border border-white rounded p-2">
+            <h3>{{ title }}</h3>
+        </div>
+    </div>
+    <div class="row">
+            <div class="offset-3 col-8 mt-2">
+                {{ form_start(form) }}  
+                    <div class="row">
+                        <div class="border border-white rounded p-3 col-5 blockForm">
+                            <h3>Informations personnelles</h3>
+                            <div>
+                                {# NOM + PRENOM #}
+                                <div class="row">
+                                    <div class="col-6 form-group">
+                                        {{ form_label(form.nom) }}
+                                        {{ form_widget(form.nom, {'attr' : {'class' : 'form-control'}}) }}
+                                    </div>
+                                    <div class="col-6 form-group">
+                                        {{ form_label(form.prenom) }}
+                                        {{ form_widget(form.prenom, {'attr' : {'class' : 'form-control'}}) }}
+                                    </div>
+                                </div>
+                                {# TELEPHONE FIXE + PORTABLE #}
+                                <div class="row">
+                                    <div class="col-6 form-group">
+                                        {{ form_label(form.telephone_fixe) }}
+                                        {{ form_widget(form.telephone_fixe, {'attr' : {'class' : 'form-control'}}) }}
+                                    </div>
+                                    <div class="col-6 form-group">
+                                        {{ form_label(form.telephone) }}
+                                        {{ form_widget(form.telephone, {'attr' : {'class' : 'form-control'}}) }}
+                                    </div>
+                                </div>
+                                {# AGE + ADRESSE MAIL #}
+                                <div class="row">
+                                    <div class="col-6 form-group">
+                                        {{ form_label(form.age) }}
+                                        {{ form_widget(form.age, {'attr' : {'class' : 'form-control'}}) }}
+                                    </div>
+                                    <div class="col-6 form-group">
+                                        {{ form_label(form.email) }}
+                                        {{ form_widget(form.email, {'attr' : {'class' : 'form-control'}}) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border border-white rounded p-3 col-5 ml-2 blockForm">
+                            <h3>Autre informations</h3>
+                            <div>
+                                <div class="col form-group">
+                                    {{ form_label(form.phase_client) }}
+                                    {{ form_widget(form.phase_client, {'attr' : {'class' : 'form-control'}}) }}
+                                </div>
+                                <div class="col form-group">
+                                    {{ form_label(form.note) }}
+                                    {{ form_widget(form.note, {'attr' : {'class' : 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="border border-whiter rounded col-5 p-3 blockForm">
+                            <h3>Informations postales</h3>
+                            {# ADRESSE POSTALE #}
+                            <div class="row">
+                                <div class="col-12">
+                                    {{ form_label(form.adressePostale) }}
+                                    {{ form_widget(form.adressePostale, {'attr' : {'class' : 'form-control'}}) }}
+                                </div>
+                            </div>
+                            {# CP + VILLE #}
+                            <div class="row">
+                                <div class="col-6">
+                                    {{ form_label(form.codePostal) }}
+                                    {{ form_widget(form.codePostal, {'attr' : {'class' : 'form-control'}}) }}
+                                </div>
+                                <div class="col-6">
+                                    {{ form_label(form.ville) }}
+                                    {{ form_widget(form.ville, {'attr' : {'class' : 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+    </div>
+    <div class="row">
+        <div class="offset-2 col-8 mt-3">
+            {{ form_widget(form.save, {'label' :  valueSave } ) }}
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}{% endblock %}

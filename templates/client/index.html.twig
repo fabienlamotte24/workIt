@@ -1,0 +1,276 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ClientController!{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.21/sp-1.1.1/datatables.min.css"/>
+    <style>
+        #table_client_info, #table_client_length, #table_client_previous, #table_client_next, #table_client_filter { color:white; }
+        td.highlight { background-color: whitesmoke !important; }
+    </style>
+
+    {# ANIMATION SPIN LOAD #}
+    <style>
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Loading animation container */
+        .loading {
+            top: 50%;
+            left: 50%;
+            width: 28px;
+            height: 28px;
+            align-items:center;
+            margin: 0 0 0 30%; 
+        }
+
+        /* Spinning circle (inner circle) */
+        .loading .maskedCircle {
+            width: 20px;
+            height: 20px;
+            border-radius: 12px;
+            border: 3px solid white;
+        }
+
+        /* Spinning circle mask */
+        .loading .mask {
+            width: 12px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        /* Spinner */
+        .loading .spinner {
+            left: 1px;
+            top: 1px;
+            width: 26px;
+            height: 26px;
+            animation: spin 0.5s infinite linear;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="text-center">Liste clients</h2>
+            </div>
+        </div>
+        <div class="row ml-5"> 
+            <div class="col-12">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row ml-5">
+            <div class="col-12">
+                <a href="{{ path('ajouter_client') }}" class="btn btn-secondary mb-1">Ajouter nouveau client</a>
+            </div>
+        </div>
+        <div class="row ml-5">
+            <table id="table_client" class="col-12 table table-dark">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id</th>
+                        <th class="text-center">Nom</th>
+                        <th class="text-center">Prénom</th>
+                        <th class="text-center">Age</th>
+                        <th class="text-center">Ville</th>
+                        <th class="text-center">CP</th>
+                        <th class="text-center">Email</th>
+                        <th class="text-center">Téléphone.fixe</th>
+                        <th class="text-center">Téléphone.portable</th>
+                        <th class="text-center">Etape</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th class="text-center">Id</th>
+                        <th class="text-center">Nom</th>
+                        <th class="text-center">Prénom</th>
+                        <th class="text-center">Age</th>
+                        <th class="text-center">Ville</th>
+                        <th class="text-center">CP</th>
+                        <th class="text-center">Email</th>
+                        <th class="text-center">Téléphone.fixe</th>
+                        <th class="text-center">Téléphone.portable</th>
+                        <th class="text-center">Etape</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    {# /////////////////////////////////// FENETRE MODALE SUPPRESSION CLIENT /////////////////////////////////////////// #}
+    <div class="modal fade" id="suppressionModale" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-dark" id="modalTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-dark" id="modalBody">
+                </div>
+                <div class="modal-footer text-dark">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="getBack">Revenir en arrière</button>
+                    <button type="button" class="btn btn-primary" id="suppressionConfirm">Confirmer suppression</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.21/sp-1.1.1/datatables.min.js"></script>    
+    {# SCRIPT CHARGEMENT DATATABLE #}
+    <script type="text/javascript">
+            var $route = "{{ path('charger_client') }}";
+            var fjson = '{{ asset("js/french.json") }}';
+            var $tableClient = $('#table_client').DataTable({
+                "dom": "<'container-12 clearfix'"+
+                                "<'grid-12'l>"+
+                                "<'grid-12'f>"+
+                                "<'grid-12'tr>" +
+                                "<'grid-12'i>"+
+                                "<'grid-12'p>"+
+                            ">",
+                    "pageLength": 25,
+                    "serverSide": true,
+                    'serverMethod': 'post',
+                    'searching': true,
+                    "ajax": {
+                        "url" : $route,
+                        "method": 'POST',
+                    },
+                    "searching": true,
+                    "columnDefs": [
+                        { "targets": 0, "defaultContent": "", "orderable": false, // Id
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 1, "defaultContent": "", "orderable": true, // Nom
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center modify-field" data-id="' + full[0] + '" data-field="Nom">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 2, "defaultContent": "" , "orderable": true, // Prénom
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center modify-field" data-id="' + full[0] + '" data-field="Prenom">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 3, "defaultContent": "" , "orderable": true, // Age
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center modify-field" data-id="' + full[0] + '" data-field="Age">' + data + ' ans</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 4, "defaultContent": "" , "orderable": true, // Ville
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 5, "defaultContent": "" , "orderable": true, // Code postal
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 6, "defaultContent": "" , "orderable": false, // Email
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center modify-field" data-id="' + full[0] + '" data-field="Email">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 7, "defaultContent": "" , "orderable": false, // Téléphone
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center modify-field" data-id="' + full[0] + '" data-field="Telephone">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 8, "defaultContent": "" , "orderable": false, // Téléphone portable
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 9, "defaultContent": "" , "orderable": false, // Phase client
+                            "render": function(data, type, full, meta){
+                                var html = '<div class="text-dark text-center">' + data + '</div>';
+                                return html;
+                            }
+                        },
+                        { "targets": 10, "defaultContent": "" , "orderable": false, // Boutton d'actions
+                            "render": function(data, type, full, meta){ 
+                                var hrefModifierClient = Routing.generate('modifier_client', { id:full[0] } );
+                                var hrefEnvoyerMail = "";
+                                var html =  '<div class="d-flex"><a href="' + hrefModifierClient + '" class="btn btn-warning" data="' + full[0] + '">Modifier</a>';
+                                    html += '<a href="' + hrefEnvoyerMail + '" class="btn btn-primary" data="' + full[0] + '">Mail</a>';
+                                    html += '<button type="button" class="btn btn-danger suppressionButton" data-toggle="modal" data-target="#suppressionModale" data-nom="' + full[1] + ' ' + full[2] +   '" data-id="' + full[0] + '"> Supprimer </button>';
+                                return html;
+                            }
+                        },
+                    ],
+                    "order" : [0, 'desc'],
+                    "language": {
+                        "search": "Filter records:",
+                        "url": fjson
+                    },
+                    drawCallback: function(){
+                        $('#table_client').removeClass('load-table');
+                    },
+            });
+            $('#table_client tbody').on( 'mouseenter', 'td', function () {
+                var colIdx = $tableClient.cell(this).index().column;
+                $( $tableClient.cells().nodes() ).removeClass( 'highlight' );
+                $( $tableClient.column( colIdx ).nodes() ).addClass( 'highlight' );
+            });
+        
+    </script>
+
+    {# ACTIONS #}
+    <script type="text/javascript">
+        /*
+        * Suppression du client avec gestion de la fenêtre modale
+        */ 
+            $(document).on('click','.suppressionButton', function(){
+                var nom = $(this).attr('data-nom');
+                var id = $(this).attr('data-id');
+                $('#modalTitle').empty().append(nom);
+                $('#modalBody').empty().append("Vous vous apprêtez à supprimer le client : " + nom + "<br />Confirmer ?");
+                $('#suppressionConfirm').attr('data-id', id);
+            });
+            $(document).on('click', '#suppressionConfirm', function(){
+                var $route = '{{ path("supprimer_client") }}';
+                var $id = $(this).attr('data-id');
+
+                $.ajax({
+                    url: $route,
+                    type: 'POST',
+                    data: { id : $id },
+                    dataType: 'json',
+                    beforeSend: function(){
+                        var html = '<div class="loading"><div class="spinner"><div class="mask"><div class="maskedCircle"></div></div></div></div>';
+                        $(document).find('#supprimer_client[data-id=' + $id + ']').empty().css("width","98px").css("height","38px").append(html);
+                    },
+                    success: function(response) {
+                        $tableClient.ajax.reload();
+                        $('#getBack').click();
+                    }
+                });
+            });
+    </script>
+{% endblock %}
